@@ -1,0 +1,82 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Project xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <PropertyPageSchema
+      Include="$(MSBuildThisFileDirectory)$(MSBuildThisFileName).xml" />
+      <AvailableItemName Include="PPCMASM">
+        <Targets>_PPCMASM</Targets>
+      </AvailableItemName>
+  </ItemGroup>
+  <PropertyGroup>
+    <ComputeLinkInputsTargets>
+      $(ComputeLinkInputsTargets);
+      ComputePPCMASMOutput;
+    </ComputeLinkInputsTargets>
+    <ComputeLibInputsTargets>
+      $(ComputeLibInputsTargets);
+      ComputePPCMASMOutput;
+    </ComputeLibInputsTargets>
+  </PropertyGroup>
+  <UsingTask
+    TaskName="PPCMASM"
+    TaskFactory="XamlTaskFactory"
+    AssemblyName="Microsoft.Build.Tasks.v4.0">
+    <Task>$(MSBuildThisFileDirectory)$(MSBuildThisFileName).xml</Task>
+  </UsingTask>
+  <Target
+    Name="_PPCMASM"
+    BeforeTargets="$(PPCMASMBeforeTargets)"
+    AfterTargets="$(PPCMASMAfterTargets)"
+    Condition="'@(PPCMASM)' != ''"
+    Outputs="%(PPCMASM.ObjectFileName)"
+    Inputs="%(PPCMASM.Identity);%(PPCMASM.AdditionalDependencies);$(MSBuildProjectFile)"
+    DependsOnTargets="_SelectedFiles">
+    <ItemGroup Condition="'@(SelectedFiles)' != ''">
+      <PPCMASM Remove="@(PPCMASM)" Condition="'%(Identity)' != '@(SelectedFiles)'" />
+    </ItemGroup>
+    <ItemGroup>
+      <PPCMASM_tlog Include="%(PPCMASM.ObjectFileName)" Condition="'%(PPCMASM.ObjectFileName)' != '' and '%(PPCMASM.ExcludedFromBuild)' != 'true'">
+        <Source>@(PPCMASM, '|')</Source>
+      </PPCMASM_tlog>
+    </ItemGroup>
+    <Message
+      Importance="High"
+      Text="%(PPCMASM.ExecutionDescription)" />
+    <WriteLinesToFile
+      Condition="'@(PPCMASM_tlog)' != '' and '%(PPCMASM_tlog.ExcludedFromBuild)' != 'true'"
+      File="$(IntDir)$(ProjectName).write.1.tlog"
+      Lines="^%(PPCMASM_tlog.Source);@(PPCMASM_tlog-&gt;'%(Fullpath)')"/>
+    <PPCMASM
+      Condition="'@(PPCMASM)' != '' and '%(PPCMASM.ExcludedFromBuild)' != 'true'"
+      CommandLineTemplate="%(PPCMASM.CommandLineTemplate)"
+      NoLogo="%(PPCMASM.NoLogo)"
+      GeneratePreprocessedSourceListing="%(PPCMASM.GeneratePreprocessedSourceListing)"
+      ListAllAvailableInformation="%(PPCMASM.ListAllAvailableInformation)"
+      AddFirstPassListing="%(PPCMASM.AddFirstPassListing)"
+      DisableSymbolTable="%(PPCMASM.DisableSymbolTable)"
+      EnableFalseConditionalsInListing="%(PPCMASM.EnableFalseConditionalsInListing)"
+      TreatWarningsAsErrors="%(PPCMASM.TreatWarningsAsErrors)"
+      MakeAllSymbolsPublic="%(PPCMASM.MakeAllSymbolsPublic)"
+      GenerateDebugInformation="%(PPCMASM.GenerateDebugInformation)"
+      EnablePPCMASM51Compatibility="%(PPCMASM.EnablePPCMASM51Compatibility)"
+      PerformSyntaxCheckOnly="%(PPCMASM.PerformSyntaxCheckOnly)"
+      ObjectFileName="%(PPCMASM.ObjectFileName)"
+      PreprocessorDefinitions="%(PPCMASM.PreprocessorDefinitions)"
+      AssembledCodeListingFile="%(PPCMASM.AssembledCodeListingFile)"
+      IncludePaths="%(PPCMASM.IncludePaths)"
+      BrowseFile="%(PPCMASM.BrowseFile)"
+      PreserveIdentifierCase="%(PPCMASM.PreserveIdentifierCase)"
+      WarningLevel="%(PPCMASM.WarningLevel)"
+      PackAlignmentBoundary="%(PPCMASM.PackAlignmentBoundary)"
+      AdditionalOptions="%(PPCMASM.AdditionalOptions)"
+      Inputs="%(PPCMASM.Identity)" />
+  </Target>
+  <Target
+    Name="ComputePPCMASMOutput"
+    Condition="'@(PPCMASM)' != ''">
+    <ItemGroup>
+      <Link Include="@(PPCMASM->Metadata('ObjectFileName')->Distinct()->ClearMetadata())" Condition="'%(PPCMASM.ExcludedFromBuild)' != 'true'"/>
+      <Lib Include="@(PPCMASM->Metadata('ObjectFileName')->Distinct()->ClearMetadata())" Condition="'%(PPCMASM.ExcludedFromBuild)' != 'true'"/>
+    </ItemGroup>
+  </Target>
+</Project>

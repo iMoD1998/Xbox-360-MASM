@@ -1,0 +1,23 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <PropertyGroup
+    Condition="'$(PPCMASMBeforeTargets)' == '' and '$(PPCMASMAfterTargets)' == '' and '$(ConfigurationType)' != 'Makefile'">
+    <PPCMASMBeforeTargets>Midl</PPCMASMBeforeTargets>
+    <PPCMASMAfterTargets>CustomBuild</PPCMASMAfterTargets>
+  </PropertyGroup>
+  <ItemDefinitionGroup>
+    <PPCMASM>
+      <NoLogo>true</NoLogo>
+      <GenerateDebugInformation>true</GenerateDebugInformation>
+      <ObjectFileName>$(IntDir)%(FileName).obj</ObjectFileName>
+      <PreserveIdentifierCase>0</PreserveIdentifierCase>
+      <WarningLevel>3</WarningLevel>
+      <PackAlignmentBoundary>0</PackAlignmentBoundary>
+      <CallingConvention>0</CallingConvention>
+      <ErrorReporting>0</ErrorReporting>
+      <CommandLineTemplate Condition="'$(Platform)' == 'Xbox 360'">ml.exe /c [AllOptions] [AdditionalOptions] /Ta[Inputs]</CommandLineTemplate>
+      <CommandLineTemplate Condition="'$(Platform)' != 'Xbox 360'">echo PPCMASM not supported on this platform</CommandLineTemplate>
+      <ExecutionDescription>Assembling [Inputs]...</ExecutionDescription>
+    </PPCMASM>
+  </ItemDefinitionGroup>
+</Project>
